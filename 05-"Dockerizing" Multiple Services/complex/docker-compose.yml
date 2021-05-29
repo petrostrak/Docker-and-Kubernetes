@@ -7,7 +7,7 @@ services:
     redis:
         image: 'redis:latest'
     nginx:
-        depends_on: # Makes sure to keep a correct flow while building all depedencies
+        depends_on: # Makes sure to keep a correct flow while building all dependencies
             - api
             - client
         restart: always # I want it always running
