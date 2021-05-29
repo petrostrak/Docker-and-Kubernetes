@@ -6,14 +6,21 @@ services:
             - POSTGRES_PASSWORD=postgres_password
     redis:
         image: 'redis:latest'
+    nginx:
+        restart: always # I want it always running
+        build: 
+            dockerfile: Dockerfile.dev
+            context: ./nginx
+        ports: 
+            - '3050:80' # 3050 on local machine should be mapped up to 80 inside the container
     api:
         build: 
             dockerfile: Dockerfile.dev
             context: ./server
         volumes: 
-            - /app/node_modules # don't try to override this folder
-            - ./server:/app     # every time we make a change in ./server this will reflect in /app in the container
-        environment:            # maps local environment variables to container.
+            - /app/node_modules # Don't try to override this folder
+            - ./server:/app     # Every time we make a change in ./server this will reflect in /app in the container
+        environment:            # Maps local environment variables to container.
             - REDIS_HOST=redis
             - REDIS_PORT=6379
             - PGUSER=postgres
