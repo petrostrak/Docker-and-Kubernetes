@@ -60,6 +60,8 @@ CMD [ "npm", "run", "start" ]
 |ports|specifies an array of ports to do the mapping|
 |restart|specifies a restart policy for a service or server container|
 |build|looks at given directory for a Dockerfile and builds image|
+|volumes|sets a placeholder of specific folders inside the container that reference the local folders|
+|environment|maps local environments to container|
 ##### Overriding dockerfile selection
 ```
 build: 
@@ -79,15 +81,45 @@ build:
 ```
 version: '3'
 services: 
-    web:
+    postgres:
+        image: 'postgres:latest'
+        environment:
+            - POSTGRES_PASSWORD=postgres_password
+    redis:
+        image: 'redis:latest'
+    api:
         build: 
-            context: .
             dockerfile: Dockerfile.dev
-        ports: 
-            - "3000":"3000"
+            context: ./server
         volumes: 
+            - /app/node_modules # don't try to override this folder
+            - ./server:/app     # every time we make a change in ./server this will reflect in /app in the container
+        environment:            # maps local environment variables to container.
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - PGUSER=postgres
+            - PGHOST=postgres
+            - PGDATABASE=postgres
+            - PGPASSWORD=postgres_password
+            - PGPORT=5432
+    client:
+        stdin_open: true
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./client
+        volumes:
             - /app/node_modules
-            - .:/app
+            - ./client:/app
+    worker:
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./worker
+        volumes:
+            - /app/node_modules
+            - ./worker:/app
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
 ```
 
 
