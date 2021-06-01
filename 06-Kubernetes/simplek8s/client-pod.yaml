@@ -1,4 +1,10 @@
+# apiVersion opens up access to us to a predefined set of
+# different object types.
 apiVersion: v1
+# kind is meant to represent or indicate the type of
+# object we want to create with kubectl
+#
+# Pod is used to run one or more very closely related containers.
 kind: Pod
 metadata:
   name: client-pod
@@ -7,6 +13,9 @@ metadata:
 spec:
   containers:
     - name: client
+      # The name of the image where the repository on Docker
+      # hub that this container is going to made out of.
       image: stephengrider/multi-client
       ports:
+        # Expose this port to this outside world
         - containerPort: 3000
